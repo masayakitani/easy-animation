@@ -25,6 +25,26 @@
     100% {\
         transform: scale(1.0, 1.0) translate(0%, 0%);\
     }\
+}\
+@keyframes up-rotate{\
+  0% {\
+      transform: scaleY(2.0) rotateY(90deg);\
+  }\
+  25% {\
+      transform: scaleY(1.0) rotateY(85deg);\
+  }\
+  50% {\
+      transform: scaleY(0.6) rotateY(80deg);\
+  }\
+  75% {\
+      transform: scaleY(2.0) rotateY(75deg);\
+  }\
+  90% {\
+      transform: scaleY(1) rotateY(60deg);\
+  }\
+  100% {\
+      transform: rotateY(0deg);\
+  }\
 }';
       console.log($('head'));
     $("head").append('<style>' + style + '</style>');
@@ -55,7 +75,30 @@
                 case 'right':
                     $this.css({'opacity': 0, 'transition': settings.transition + 's', 'transform': 'translate(50%, 0)'});
                     break;
-              } 
+                case 'up-stairs':
+                    $this.wrapInner('<div>');
+                    var $inner=$this.children('div');
+                    var h = $inner.height();
+                    $inner.css({'overflow':'hidden','display':'flex','align-items':'center'});
+                    $inner.children().addBack().contents().each(function() {
+                      const text=$(this).text();
+                      $(this).replaceWith(text.replace(/(\S)/g, '<span>$1</span>'));
+                    });
+                    $inner.children('span').css({'display':'inline-block','transition':'.7s','position':'relative','top':`${h}px`});
+                    break;
+                case 'up-rotate':
+                    $this.wrapInner('<div>');
+                    var $inner=$this.children('div');
+                    $inner.css({'overflow':'hidden','display':'flex','align-items':'center'});
+                    $inner.children().addBack().contents().each(function() {
+                      const text=$(this).text();
+                      $(this).replaceWith(text.replace(/(\S)/g, '<span>$1</span>'));
+                    });
+                    $inner.children('span').css({'opacity': 0});
+                    break;
+
+
+              }
             $this.on("inview", function (event, isInView) {
                 if (isInView) {
                     console.log(settings.mode);
@@ -65,6 +108,23 @@
                             break;
                         case 'strong-bound':
                             $this.css({'animation': 'strong-bound 0.8s linear 0s'});
+                            break;
+                        case 'up-stairs':
+                            var $inner=$this.children('div');
+                            for (var i = 0; i <= $inner.text().replace(/\s+/g,'').length; i++) {
+                              $inner.children(`span:nth-of-type(${i+1})`).delay(i*80).queue(function(){
+                                $(this).css('top', '0');
+                              })
+                            };
+                            break;
+                        case 'up-rotate':
+                            var $inner=$this.children('div');
+                            for (var i = 0; i <= $inner.text().replace(/\s+/g,'').length; i++) {
+                              $inner.children(`span:nth-of-type(${i+1})`).delay(i*30).queue(function(){
+                                $(this).css({'animation': 'up-rotate .15s ease alternate', 'opacity': base_opacity,});
+                                // $(this).css({'transform':'rotateY( 360deg )','transform':'scale(.5)','opacity': 1});
+                              })
+                            };
                             break;
                         default:
                             $(this).stop().css({'opacity': base_opacity, 'transform': base_transform });
@@ -76,7 +136,7 @@
         /* jQueryオブジェクトを返す */
         return this;
     }
-    
+
 })(jQuery);
 
 /**
@@ -96,10 +156,10 @@
       factory(jQuery);
     }
   }(function ($) {
-  
+
     var inviewObjects = [], viewportSize, viewportOffset,
         d = document, w = window, documentElement = d.documentElement, timer;
-  
+
     $.event.special.inview = {
       add: function(data) {
         inviewObjects.push({ data: data, $element: $(this), element: this });
@@ -117,7 +177,7 @@
            timer = setInterval(checkInView, 250);
         }
       },
-  
+
       remove: function(data) {
         for (var i=0; i<inviewObjects.length; i++) {
           var inviewObject = inviewObjects[i];
@@ -126,7 +186,7 @@
             break;
           }
         }
-  
+
         // Clear interval when we no longer have any elements listening
         if (!inviewObjects.length) {
            clearInterval(timer);
@@ -134,10 +194,10 @@
         }
       }
     };
-  
+
     function getViewportSize() {
       var mode, domObject, size = { height: w.innerHeight, width: w.innerWidth };
-  
+
       // if this is correct then return it. iPad has compat Mode, so will
       // go into check clientHeight/clientWidth (which has the wrong value).
       if (!size.height) {
@@ -152,42 +212,42 @@
           };
         }
       }
-  
+
       return size;
     }
-  
+
     function getViewportOffset() {
       return {
         top:  w.pageYOffset || documentElement.scrollTop   || d.body.scrollTop,
         left: w.pageXOffset || documentElement.scrollLeft  || d.body.scrollLeft
       };
     }
-  
+
     function checkInView() {
       if (!inviewObjects.length) {
         return;
       }
-  
+
       var i = 0, $elements = $.map(inviewObjects, function(inviewObject) {
         var selector  = inviewObject.data.selector,
             $element  = inviewObject.$element;
         return selector ? $element.find(selector) : $element;
       });
-  
+
       viewportSize   = viewportSize   || getViewportSize();
       viewportOffset = viewportOffset || getViewportOffset();
-  
+
       for (; i<inviewObjects.length; i++) {
         // Ignore elements that are not in the DOM tree
         if (!$.contains(documentElement, $elements[i][0])) {
           continue;
         }
-  
+
         var $element      = $($elements[i]),
             elementSize   = { height: $element[0].offsetHeight, width: $element[0].offsetWidth },
             elementOffset = $element.offset(),
             inView        = $element.data('inview');
-  
+
         // Don't ask me why because I haven't figured out yet:
         // viewportOffset and viewportSize are sometimes suddenly null in Firefox 5.
         // Even though it sounds weird:
@@ -196,7 +256,7 @@
         if (!viewportOffset || !viewportSize) {
           return;
         }
-  
+
         if (elementOffset.top + elementSize.height > viewportOffset.top &&
             elementOffset.top < viewportOffset.top + viewportSize.height &&
             elementOffset.left + elementSize.width > viewportOffset.left &&
@@ -209,11 +269,11 @@
         }
       }
     }
-  
+
     $(w).on("scroll resize scrollstop", function() {
       viewportSize = viewportOffset = null;
     });
-  
+
     // IE < 9 scrolls to focused elements without firing the "scroll" event
     if (!documentElement.addEventListener && documentElement.attachEvent) {
       documentElement.attachEvent("onfocusin", function() {
@@ -221,4 +281,3 @@
       });
     }
   }));
-  
