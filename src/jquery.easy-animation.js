@@ -45,12 +45,41 @@
   100% {\
       transform: rotateY(0deg);\
   }\
+}\
+@keyframes reveal-right {\
+  0% {\
+    width: 0;\
+    right: 0;\
+  }\
+  65% {\
+    width: 100%;\
+    right: 0;\
+  }\
+  100% {\
+    width: 0;\
+    right: 100%;\
+  }\
+}\
+@keyframes reveal-left {\
+  0% {\
+    width: 0;\
+    left: 0;\
+  }\
+  65% {\
+    width: 100%;\
+    left: 0;\
+  }\
+  100% {\
+    width: 0;\
+    left: 100%;\
+  }\
 }';
-      console.log($('head'));
     $("head").append('<style>' + style + '</style>');
     const defaults={
         mode:"in",
         transition: 1,
+        primaryColor: "#222",
+        secondColor: "#aaa"
     }
     $.fn.easyAnimation=function(options){
         /* 引数の初期値を設定（カンマ区切り） */
@@ -96,12 +125,31 @@
                     });
                     $inner.children('span').css({'opacity': 0});
                     break;
+                case 'reveal-left':
+                  $this.wrapInner('<div>');
+                  $inner = $this.children('div');
+                  $inner.wrapInner('<div>');
+                  $inner.css({'position': 'relative', 'display': 'inline-block'});
+                  $inner.children('div').css({'opacity': 0, 'transition': '.1s ' + settings.transition * 0.55 + 's'});
+                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before, .' + this.className + '.easy-animation-in > div::after { content: ""; position: absolute; top: 0; right: 0;height: 100%; z-index: 10; } </style>');
+                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before { background-color: ' + settings.primaryColor + '; animation: reveal-left ' + settings.transition + 's ease; } </style>');
+                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::after { background-color: ' + settings.secondColor + '; animation: reveal-left ' + settings.transition * 0.55 + 's ' + settings.transition * 0.33 + 's ease; } </style>'); 
+                  break;
+                case 'reveal-right':
+                  $this.wrapInner('<div>');
+                  $inner = $this.children('div');
+                  $inner.wrapInner('<div>');
+                  $inner.css({'position': 'relative', 'display': 'inline-block'});
+                  $inner.children('div').css({'opacity': 0, 'transition': '.1s ' + settings.transition * 0.55 + 's'});
+                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before, .' + this.className + '.easy-animation-in > div::after { content: ""; position: absolute; top: 0; right: 0;height: 100%; z-index: 10; } </style>');
+                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before { background-color: ' + settings.primaryColor + '; animation: reveal-right ' + settings.transition + 's ease; } </style>');
+                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::after { background-color: ' + settings.secondColor + '; animation: reveal-right ' + settings.transition * 0.55 + 's ' + settings.transition * 0.33 + 's ease; } </style>'); 
+                  break;
 
 
-              }
+            }
             $this.on("inview", function (event, isInView) {
                 if (isInView) {
-                    console.log(settings.mode);
                     switch (settings.mode) {
                         case 'bound':
                             $this.css({'animation': 'bound .3s ease infinite alternate'});
@@ -122,10 +170,19 @@
                             for (var i = 0; i <= $inner.text().replace(/\s+/g,'').length; i++) {
                               $inner.children(`span:nth-of-type(${i+1})`).delay(i*30).queue(function(){
                                 $(this).css({'animation': 'up-rotate .15s ease alternate', 'opacity': base_opacity,});
-                                // $(this).css({'transform':'rotateY( 360deg )','transform':'scale(.5)','opacity': 1});
                               })
                             };
                             break;
+                        case 'reveal-left':
+                          $inner = $this.children('div');
+                          $inner.children('div').css({'opacity': base_opacity});
+                          $this.addClass('easy-animation-in');
+                          break;
+                        case 'reveal-right':
+                          $inner = $this.children('div');
+                          $inner.children('div').css({'opacity': base_opacity});
+                          $this.addClass('easy-animation-in');
+                          break;
                         default:
                             $(this).stop().css({'opacity': base_opacity, 'transform': base_transform });
                             break;

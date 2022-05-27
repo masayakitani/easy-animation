@@ -10,8 +10,10 @@
         <div class="fade-right" style="height: 100px; width: 100px; background-color: skyblue; margin-bottom: 1000px;"></div>
         <div class="bound" style="height: 100px; width: 100px; background-color: purple; margin-bottom: 1000px;"></div>
         <div class="strong-bound" style="height: 100px; width: 100px; background-color: orange; margin-bottom: 100px;"></div>
-        <div class="fade-up-stairs" style="margin-bottom: 100px; font-size: 2rem;">サンプル</div>
-        <div class="fade-up-rotate" style="margin-bottom: 100px; font-size: 2rem;">サンプルサンプル</div>
+        <div class="fade-up-stairs" style="margin-bottom: 100px; font-size: 2rem;">Sample</div>
+        <div class="fade-up-rotate" style="margin-bottom: 100px; font-size: 2rem;">SampleSample</div>
+        <div class="reveal-left" style="margin-bottom: 100px; font-size: 2rem;">SampleSample</div>
+        <div class="reveal-right" style="margin-bottom: 100px; font-size: 2rem;">SampleSample</div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="../src/jquery.easy-animation.js"></script>
         <script>
@@ -24,6 +26,8 @@
                 $('.strong-bound').easyAnimation({mode: 'strong-bound'});
                 $('.fade-up-stairs').easyAnimation({mode: 'up-stairs'});
                 $('.fade-up-rotate').easyAnimation({mode: 'up-rotate'});
+                $('.reveal-left').easyAnimation({mode: 'reveal-left', transition: 1.6});
+                $('.reveal-right').easyAnimation({mode: 'reveal-right', transition: 1.6, primaryColor: 'red', secondColor: 'orange'});
             })
         </script>
     </body>
