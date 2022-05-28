@@ -84,6 +84,15 @@
     $.fn.easyAnimation=function(options){
         /* 引数の初期値を設定（カンマ区切り） */
         const settings=$.extend({}, defaults, options);
+        if (settings.mode == 'reveal-left') {
+          $('head').append('<style>.' + this[0].className + '.easy-animation-in > div::before, .' + this[0].className + '.easy-animation-in > div::after { content: ""; position: absolute; top: 0; right: 0;height: 100%; z-index: 10; } </style>');
+          $('head').append('<style>.' + this[0].className + '.easy-animation-in > div::before { background-color: ' + settings.primaryColor + '; animation: reveal-left ' + settings.transition + 's ease; } </style>');
+          $('head').append('<style>.' + this[0].className + '.easy-animation-in > div::after { background-color: ' + settings.secondColor + '; animation: reveal-left ' + settings.transition * 0.55 + 's ' + settings.transition * 0.33 + 's ease; } </style>'); 
+        } else if (settings.mode == 'reveal-right') {
+          $('head').append('<style>.' + this[0].className + '.easy-animation-in > div::before, .' + this[0].className + '.easy-animation-in > div::after { content: ""; position: absolute; top: 0; right: 0;height: 100%; z-index: 10; } </style>');
+          $('head').append('<style>.' + this[0].className + '.easy-animation-in > div::before { background-color: ' + settings.primaryColor + '; animation: reveal-right ' + settings.transition + 's ease; } </style>');
+          $('head').append('<style>.' + this[0].className + '.easy-animation-in > div::after { background-color: ' + settings.secondColor + '; animation: reveal-right ' + settings.transition * 0.55 + 's ' + settings.transition * 0.33 + 's ease; } </style>'); 
+        }
         /* 一致した要素上で繰り返す */
         this.each(function(){
             /* 現在の要素を$thisに格納。この場合はtooltipクラスを持つa要素 */
@@ -131,9 +140,6 @@
                   $inner.wrapInner('<div>');
                   $inner.css({'position': 'relative', 'display': 'inline-block'});
                   $inner.children('div').css({'opacity': 0, 'transition': '.1s ' + settings.transition * 0.55 + 's'});
-                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before, .' + this.className + '.easy-animation-in > div::after { content: ""; position: absolute; top: 0; right: 0;height: 100%; z-index: 10; } </style>');
-                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before { background-color: ' + settings.primaryColor + '; animation: reveal-left ' + settings.transition + 's ease; } </style>');
-                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::after { background-color: ' + settings.secondColor + '; animation: reveal-left ' + settings.transition * 0.55 + 's ' + settings.transition * 0.33 + 's ease; } </style>'); 
                   break;
                 case 'reveal-right':
                   $this.wrapInner('<div>');
@@ -141,9 +147,6 @@
                   $inner.wrapInner('<div>');
                   $inner.css({'position': 'relative', 'display': 'inline-block'});
                   $inner.children('div').css({'opacity': 0, 'transition': '.1s ' + settings.transition * 0.55 + 's'});
-                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before, .' + this.className + '.easy-animation-in > div::after { content: ""; position: absolute; top: 0; right: 0;height: 100%; z-index: 10; } </style>');
-                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::before { background-color: ' + settings.primaryColor + '; animation: reveal-right ' + settings.transition + 's ease; } </style>');
-                  $('head').append('<style>.' + this.className + '.easy-animation-in > div::after { background-color: ' + settings.secondColor + '; animation: reveal-right ' + settings.transition * 0.55 + 's ' + settings.transition * 0.33 + 's ease; } </style>'); 
                   break;
 
 
